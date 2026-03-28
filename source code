@@ -1,0 +1,184 @@
+#include <iostream>
+#include <vector>
+#include <ctime>
+
+using namespace std;
+
+// ------------------------------------------------------------
+// Custom Random Generator (LCG)
+// ------------------------------------------------------------
+long long seed = 123456789;
+
+int generateRandom()
+{
+    const long long a = 1664525;
+    const long long c = 1013904223;
+    const long long m = (1LL << 31);
+
+    seed = (a * seed + c) % m;
+    return (int)(seed % 100000);
+}
+
+// ------------------------------------------------------------
+// Generate Dataset
+// ------------------------------------------------------------
+vector<int> generateData(int size)
+{
+    vector<int> data(size);
+    for (int i = 0; i < size; i++)
+        data[i] = generateRandom();
+    return data;
+}
+
+// ------------------------------------------------------------
+// Insertion Sort
+// ------------------------------------------------------------
+void insertionSort(vector<int>& arr)
+{
+    int n = arr.size();
+    for (int i = 1; i < n; i++)
+    {
+        int key = arr[i];
+        int j = i - 1;
+
+        while (j >= 0 && arr[j] > key)
+        {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+// ------------------------------------------------------------
+// Merge Sort
+// ------------------------------------------------------------
+void merge(vector<int>& arr, int left, int mid, int right)
+{
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    vector<int> L(n1), R(n2);
+
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (int i = 0; i < n2; i++)
+        R[i] = arr[mid + 1 + i];
+
+    int i = 0, j = 0, k = left;
+
+    while (i < n1 && j < n2)
+    {
+        if (L[i] <= R[j])
+            arr[k++] = L[i++];
+        else
+            arr[k++] = R[j++];
+    }
+
+    while (i < n1)
+        arr[k++] = L[i++];
+
+    while (j < n2)
+        arr[k++] = R[j++];
+}
+
+void mergeSort(vector<int>& arr, int left, int right)
+{
+    if (left < right)
+    {
+        int mid = (left + right) / 2;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
+
+
+// Quick Sort
+
+int partition(vector<int>& arr, int low, int high)
+{
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; j++)
+    {
+        if (arr[j] < pivot)
+        {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quickSort(vector<int>& arr, int low, int high)
+{
+    if (low < high)
+    {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+// ------------------------------------------------------------
+// Run Test for All Algorithms
+// ------------------------------------------------------------
+void runTest(int size)
+{
+    vector<int> data = generateData(size);
+
+    // Copy datasets for fair comparison
+    vector<int> arr1 = data;
+    vector<int> arr2 = data;
+    vector<int> arr3 = data;
+
+    // Insertion Sort
+    clock_t start1 = clock();
+    insertionSort(arr1);
+    clock_t end1 = clock();
+
+    // Merge Sort
+    clock_t start2 = clock();
+    mergeSort(arr2, 0, arr2.size() - 1);
+    clock_t end2 = clock();
+
+    // Quick Sort
+    clock_t start3 = clock();
+    quickSort(arr3, 0, arr3.size() - 1);
+    clock_t end3 = clock();
+
+    cout << "Input Size: " << size << endl;
+
+    cout << "Insertion Sort Time: "
+         << double(end1 - start1) / CLOCKS_PER_SEC << " sec\n";
+
+    cout << "Merge Sort Time    : "
+         << double(end2 - start2) / CLOCKS_PER_SEC << " sec\n";
+
+    cout << "Quick Sort Time    : "
+         << double(end3 - start3) / CLOCKS_PER_SEC << " sec\n";
+
+    cout << "-----------------------------------------\n";
+}
+
+// ------------------------------------------------------------
+// Main Function
+// ------------------------------------------------------------
+int main()
+{
+    int sizes[] = {10, 100, 1000, 10000, 100000};
+    cout<<"Student Name : MINHAJUL OSMAN"<<endl;
+     cout<<"Student Id : C243210"<<endl<<endl;
+     cout<<"Here execution time of different input size of different sorting algorithm is shown below -"<<endl<<endl;
+
+    for (int i = 0; i < 5; i++)
+    {
+        runTest(sizes[i]);
+    }
+
+    return 0;
+}
